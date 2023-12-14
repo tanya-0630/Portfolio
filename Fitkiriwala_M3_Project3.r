@@ -1,0 +1,115 @@
+print("Tanya Fitkiriwala")
+install.packages("FSA")
+install.packages("FSAdata")
+install.packages("magrittr")
+install.packages("dplyr")
+install.packages("tidyr")
+install.packages("plyr")
+install.packages("tidyverse")
+
+
+library(FSA)
+library(FSAdata)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(plyr)
+library(tidyverse)
+
+getwd()
+setwd("C:/Users/tanya/OneDrive/Projects Submitted")
+bio <- read.table("inchBio.csv", sep = ",", header= TRUE)
+bio
+
+headtail(bio, n=3)
+str(bio)
+level <- table(bio$species, bio$scale)
+level
+
+
+counts <- table(bio$species)
+counts
+names(counts)
+
+
+tmp <- as.data.frame(counts)
+tmp
+
+tmp2 <- bio$species
+head(tmp2, n=5)
+class(tmp2)
+
+w <- table(tmp2)
+w
+class(w)
+
+t <- as.data.frame(w)
+t
+t$Freq
+class(t$Freq)
+
+cSpec <- table(bio$species)
+cSpec
+class(cSpec)     
+cSpec <- cSpec[order(cSpec,decreasing = TRUE)]
+cSpec
+
+cSpecPct <- cSpec
+cSpecPct <- prop.table(cSpecPct)*100
+cSpecPct 
+class(cSpecPct)
+
+
+u <- as.data.frame(cSpecPct)
+u
+class(u)
+
+
+br1 <- barplot(cSpec, width =1, space = .15, axes = T, ylim = c(0,250), ylab = "COUNTS",
+               col = "LightGreen", cex.names=0.6, main = "Fish Count", las = 2)
+
+
+
+br2 <-  barplot(cSpecPct/10, width =1, space = .15, axes = T, ylim = c(0,4), ylab = "COUNTS", col.lab = "LightBlue",
+                col = "LightPink", cex.names=0.6, main = "Fish Relative Frequency", las = 2)
+
+
+d <- u[order(u$Freq,decreasing = TRUE),]
+d
+
+
+colnames(d) <- c("Species", "RelFreq")
+d
+d$CumFreq <- cumsum(d$RelFreq)
+y <- as.data.frame(cSpec)
+colnames(y) <- c("Species", "Freq")
+d <- merge(x= d, y= y, by = "Species", all.x = TRUE)
+
+d <- d[order(d$CumFreq,decreasing = FALSE),]
+colnames(d) <- c("Species","RelFreq","CumFreq", "Counts")
+d$CumCounts <- cumsum(d$Counts)
+d
+
+def_par <- par()
+
+pc <- barplot(d$Counts, width =1, space = .15, border = F, axes = F, ylim = c(0,3.05*max(d$Counts, na.rm = TRUE)),
+              ylab = "Cumulative Counts",col = "LightGreen", cex.names=.70, main = "Species Pareto", 
+              las = 2, names.arg = d$Species)
+
+
+
+lines(pc, d$CumCounts, type = "b", cex = 0.7, pch = 19, col="cyan4")
+
+box(col = "gray50")
+
+axis(side = 2, at = c(0, d$CumCounts), las = 1, col.axis = "grey62", col = "grey62", cex.axis = 0.8)
+
+axis(side = 4, at = c(0, d$CumCounts), labels = paste(c(0, round(d$CumFreq)) ,"%",sep=""), 
+     las = 3, col.axis = "cyan3", col = "cyan4", cex.axis = 0.8)
+
+
+mtext("Fitkiriwala", side = 1)
+mtext("Fitkiriwala", side = 2)
+mtext("Fitkiriwala", side = 3)
+mtext("Fitkiriwala", side = 4)
+
